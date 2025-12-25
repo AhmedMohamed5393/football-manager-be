@@ -1,10 +1,9 @@
 import * as redisStore from 'cache-manager-ioredis';
 import { Global, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from './services/index.service';
-import { redisConfig, typeormConfig } from './config';
+import { redisConfig } from './config';
 
 @Global()
 @Module({
@@ -16,11 +15,6 @@ import { redisConfig, typeormConfig } from './config';
       store: redisStore,
         ...redisConfig(config),
       }),
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => typeormConfig(config),
     }),
   ],
   exports: [

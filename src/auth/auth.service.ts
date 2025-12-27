@@ -3,13 +3,16 @@ import { JwtService } from "@nestjs/jwt";
 import { comparePasswords, hashPassword } from "@shared/util";
 import { User } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
+import { TeamService } from "src/team/team.service";
 import { RegisterDto, LoginDto } from "./dto";
+import { AuthUserPayloadInterface } from "@shared/interfaces";
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
+        private readonly teamService: TeamService,
     ) {}
 
     public async register(registerDto: RegisterDto) {
@@ -21,6 +24,10 @@ export class AuthService {
         const hashedPassword = await hashPassword(password);
 
         const user = await this.userService.createUser(email, hashedPassword);
+        
+        // 🔥 Emit async job for creating team for the created user
+        await this.teamService.createTeamAsync(user);
+
         const token = this.generateToken(user);
 
         return this.prepareUserResponse(user, token);
@@ -41,13 +48,17 @@ export class AuthService {
     }
 
     private generateToken(user: User) {
-        const payload = { sub: user.id, email: user.email };
+        const payload: AuthUserPayloadInterface = {
+            sub: user.id,
+            email: user.email,
+        };
 
         return this.jwtService.sign(payload);
     }
 
     private prepareUserResponse(user: User, token: string) {
         const { password, ...userData } = user;
+
         return { ...userData, token };
     }
 }

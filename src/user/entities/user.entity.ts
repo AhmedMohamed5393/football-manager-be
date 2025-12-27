@@ -1,5 +1,6 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Base } from '@shared/entities/base.entity';
+import { Base } from '@shared/entities';
+import { Team } from 'src/team/entities';
+import { Entity, Column, OneToOne } from 'typeorm';
 
 @Entity()
 export class User extends Base {
@@ -8,4 +9,7 @@ export class User extends Base {
 
   @Column()
   password: string;
+
+  @OneToOne(() => Team, team => team.user)
+  team: Team;
 }

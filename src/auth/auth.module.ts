@@ -4,11 +4,14 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { UserModule } from "src/user/user.module";
-import { JwtStrategy } from "../shared/strategies/jwt.strategy";
+import { JwtStrategy } from "../shared/strategies";
+import { PassportModule } from "@nestjs/passport";
+import { TeamModule } from "src/team/team.module";
 
 @Module({
     imports: [
         UserModule,
+        TeamModule,
         ConfigModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
@@ -18,6 +21,7 @@ import { JwtStrategy } from "../shared/strategies/jwt.strategy";
                 signOptions: { expiresIn: '200s' },
             }),
         }),
+        PassportModule.register({ defaultStrategy: 'jwt' })
     ],
     controllers: [
         AuthController,
@@ -26,6 +30,6 @@ import { JwtStrategy } from "../shared/strategies/jwt.strategy";
         AuthService,
         JwtStrategy,
     ],
-    exports: [],
+    exports: [PassportModule],
 })
 export class AuthModule {}

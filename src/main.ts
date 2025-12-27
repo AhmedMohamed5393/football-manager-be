@@ -3,8 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { join } from 'path';
-import * as express from 'express';
 import { HttpExceptionFilter } from 'src/shared/filters/http-exception.filter';
 import { LoggingInterceptor } from 'src/shared/interceptors/logging.interceptor';
 
@@ -24,7 +22,7 @@ async function bootstrap() {
         type: 'http',
         in: 'Header',
       },
-      'access-token',
+      'jwt',
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);

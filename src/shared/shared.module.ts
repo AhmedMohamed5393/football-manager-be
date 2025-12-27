@@ -12,7 +12,7 @@ import { redisConfig } from './config';
       imports: [],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-      store: redisStore,
+        store: redisStore,
         ...redisConfig(config),
       }),
     }),

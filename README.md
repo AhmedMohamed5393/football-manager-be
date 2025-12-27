@@ -32,3 +32,15 @@ http://localhost:3000/api
 1. Docker & Docker Compose installed
 2. Node.js >= 18.x (if running locally without Docker)
 3. Redis & PostgreSQL running (handled automatically by Docker Compose)
+
+# ⏱ Time Report
+| Section | Description | Time Spent |
+|------------------------|-----------------------------------------------|------|
+| Project setup          | NestJS setup, Docker, env configuration       | 2h   |
+| Database design        | Entity modeling (User, Team, Player)          | 1h   |
+| Authentication         | Single register/login flow, JWT setup         | 2h   |
+| Async team creation    | Bull + Redis queue, background worker         | 1h   |
+| Transfer market logic  | Listing players, buying logic, transactions   | 2h   |
+| Filtering & querying   | Transfer market filters using QueryBuilder    | 1h   |
+| Swagger documentation  | Implement unit tests on auth and user modules | 1h   |
+| **Total** |  | **10h** |

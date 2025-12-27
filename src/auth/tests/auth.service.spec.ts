@@ -6,6 +6,8 @@ import { User } from 'src/user/entities/user.entity';
 import { hashPassword, comparePasswords } from '@shared/util';
 import { AuthService } from '../auth.service';
 import { RegisterDto, LoginDto } from '../dto';
+import { TeamService } from 'src/team/team.service';
+import { Team } from 'src/team/entities';
 
 jest.mock('@shared/util', () => ({
   hashPassword: jest.fn(),
@@ -16,6 +18,7 @@ describe('AuthService', () => {
   let authService: AuthService;
   let userService: jest.Mocked<UserService>;
   let jwtService: jest.Mocked<JwtService>;
+  let teamService: jest.Mocked<TeamService>;
 
   const mockUserService = () => ({
     findByEmail: jest.fn(),
@@ -24,6 +27,10 @@ describe('AuthService', () => {
 
   const mockJwtService = () => ({
     sign: jest.fn(),
+  });
+
+  const mockTeamService = () => ({
+    createTeamAsync: jest.fn(),
   });
 
   beforeEach(async () => {
@@ -38,12 +45,17 @@ describe('AuthService', () => {
           provide: JwtService,
           useFactory: mockJwtService,
         },
+        {
+          provide: TeamService,
+          useFactory: mockTeamService,
+        },
       ],
     }).compile();
 
     authService = module.get(AuthService);
     userService = module.get(UserService);
     jwtService = module.get(JwtService);
+    teamService = module.get(TeamService);
   });
 
   afterEach(() => {
@@ -67,17 +79,22 @@ describe('AuthService', () => {
         email: 'test@test.com',
         password: '123456',
       };
-
       const hashedPassword = 'hashedPassword';
       const user: User = {
         id: '3d99f919-d454-4fff-88ff-eed52b66c0b1',
         email: dto.email,
         password: hashedPassword,
       } as User;
+      const team = {
+        id: 'team-id',
+        name: 'test FC',
+        user: user,
+      } as Team;
 
       userService.findByEmail.mockResolvedValue(null);
       (hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
       userService.createUser.mockResolvedValue(user);
+      teamService.createTeamAsync.mockImplementationOnce(async () => void 0);
       jwtService.sign.mockReturnValue('jwt-token');
 
       const result = await authService.register(dto);
@@ -85,6 +102,7 @@ describe('AuthService', () => {
       expect(userService.findByEmail).toHaveBeenCalledWith(dto.email);
       expect(hashPassword).toHaveBeenCalledWith(dto.password);
       expect(userService.createUser).toHaveBeenCalledWith(dto.email, hashedPassword);
+      expect(teamService.createTeamAsync).toHaveBeenCalled();
       expect(jwtService.sign).toHaveBeenCalledWith({
         sub: user.id,
         email: user.email,
